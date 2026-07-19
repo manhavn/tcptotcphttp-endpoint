@@ -4,19 +4,14 @@ cd "$(dirname "$0")/.."
 set -euo pipefail
 
 APP="tcptotcphttp-endpoint"
-OUT="${APP}-linux-amd64"
-TARGET="x86_64-unknown-linux-musl"
+OUT="${APP}-linux-arm64"
+TARGET="aarch64-unknown-linux-musl"
 
 echo "Building ${OUT} (static musl) ..."
 rustup target add "${TARGET}" >/dev/null 2>&1 || true
 
-export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER="${CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER:-musl-gcc}"
-
 cargo build --release --target "${TARGET}"
 BIN="target/${TARGET}/release/${APP}"
 cp -f "${BIN}" "${OUT}"
-strip "${OUT}" 2>/dev/null || true
-
 echo "OK: ${OUT}"
 file "${OUT}" 2>/dev/null || true
-ldd "${OUT}" 2>&1 | head -3 || true

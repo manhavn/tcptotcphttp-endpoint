@@ -3,9 +3,10 @@ WORKDIR /app
 RUN apk add --no-cache musl-dev
 ADD . .
 ENV CARGO_TERM_COLOR=always
-RUN cargo build --release
-RUN strip target/release/tcptotcphttp-endpoint || true
+RUN rustup target add x86_64-unknown-linux-musl
+RUN cargo build --release --target x86_64-unknown-linux-musl
+RUN strip target/x86_64-unknown-linux-musl/release/tcptotcphttp-endpoint || true
 
 FROM alpine AS runtime
-COPY --from=build /app/target/release/tcptotcphttp-endpoint /tcptotcphttp-endpoint
+COPY --from=build /app/target/x86_64-unknown-linux-musl/release/tcptotcphttp-endpoint /tcptotcphttp-endpoint
 ENTRYPOINT ["/tcptotcphttp-endpoint"]
